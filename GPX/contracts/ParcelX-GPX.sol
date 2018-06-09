@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.23;
 
 import "./SafeMath.sol";
 import "./ERC20.sol";
@@ -24,7 +24,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXToken(address[] _otherOwners, uint _multiRequires) 
+    constructor(address[] _otherOwners, uint _multiRequires) 
         MultiOwnable(_otherOwners, _multiRequires) public {
         tokenPool = this;
         balances[tokenPool] = TOTAL_SUPPLY;
@@ -44,7 +44,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        Transfer(msg.sender, _to, _value);
+        emit Transfer(msg.sender, _to, _value);
         return true;
   }
 
@@ -60,13 +60,13 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
@@ -76,7 +76,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
 
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -87,7 +87,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         } else {
             allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-        Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+        emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
@@ -101,11 +101,11 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     event Withdraw(address indexed who, uint256 value, address indexed lastApprover);
         
 
-    function getBuyRate() public view returns (uint256) {
+    function getBuyRate() external view returns (uint256) {
         return buyRate;
     }
 
-    function setBuyRate(uint256 newBuyRate) mostOwner(keccak256(msg.data)) public {
+    function setBuyRate(uint256 newBuyRate) mostOwner(keccak256(msg.data)) external {
         buyRate = newBuyRate;
     }
 
@@ -116,7 +116,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         require(balances[tokenPool] >= tokens);               // checks if it has enough to sell
         balances[tokenPool] = balances[tokenPool].sub(tokens);                        // subtracts amount from seller's balance
         balances[msg.sender] = balances[msg.sender].add(tokens);                  // adds the amount to buyer's balance
-        Transfer(tokenPool, msg.sender, tokens);               // execute an event reflecting the change
+        emit Transfer(tokenPool, msg.sender, tokens);               // execute an event reflecting the change
         return tokens;                                    // ends function and returns
     }
 
@@ -124,26 +124,26 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     function () public payable {
         if (msg.value > 0) {
             buy();
-            Deposit(msg.sender, msg.value);
+            emit Deposit(msg.sender, msg.value);
         }
     }
 
     function execute(address _to, uint256 _value, bytes _data) mostOwner(keccak256(msg.data)) external returns (bool){
         require(_to != address(0));
-        Withdraw(_to, _value, msg.sender);
+        emit Withdraw(_to, _value, msg.sender);
         return _to.call.value(_value)(_data);
     }
 
     /**
      * FEATURE 5): Convertible implements
      */
-    function convertMainchainGPX(string destinationAccount, string extra) public returns (bool) {
+    function convertMainchainGPX(string destinationAccount, string extra) external returns (bool) {
         require(bytes(destinationAccount).length > 10 && bytes(destinationAccount).length < 128);
         require(balances[msg.sender] > 0);
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
         balances[tokenPool] = balances[tokenPool].add(amount);   // recycle ParcelX to tokenPool's init account
-        Converted(msg.sender, destinationAccount, amount, extra);
+        emit Converted(msg.sender, destinationAccount, amount, extra);
         return true;
     }
 

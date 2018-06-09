@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.23;
 
 /**
  * Starndard ERC20 interface: https://github.com/ethereum/EIPs/issues/20

@@ -1,0 +1,15 @@
+node_modules
+.idea
+coverage
+npm-debug.log
+reports
+coverage.json
+build
+
+# Config files
+config/local.json
+config/development.json
+config/staging.json
+config/production.json
+
+

@@ -20,14 +20,14 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     uint8 public constant decimals = 18;
     uint256 public constant TOTAL_SUPPLY = uint256(1000000000) * (uint256(10) ** decimals);  // 10,0000,0000
 
-    address internal creator;
+    address internal tokenPool;      // Use a token pool holding all GPX. Avoid using sender address.
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
     function ParcelXToken(address[] _otherOwners, uint _multiRequires) 
         MultiOwnable(_otherOwners, _multiRequires) public {
-        creator = msg.sender;
-        balances[creator] = TOTAL_SUPPLY;
+        tokenPool = this;
+        balances[tokenPool] = TOTAL_SUPPLY;
     }
 
     /**
@@ -113,10 +113,10 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     function buy() payable whenNotPaused public returns (uint256) {
         require(msg.value >= 1 ether);
         uint256 tokens = msg.value.mul(buyRate);  // calculates the amount
-        require(balances[creator] >= tokens);               // checks if it has enough to sell
-        balances[creator] = balances[creator].sub(tokens);                        // subtracts amount from seller's balance
+        require(balances[tokenPool] >= tokens);               // checks if it has enough to sell
+        balances[tokenPool] = balances[tokenPool].sub(tokens);                        // subtracts amount from seller's balance
         balances[msg.sender] = balances[msg.sender].add(tokens);                  // adds the amount to buyer's balance
-        Transfer(creator, msg.sender, tokens);               // execute an event reflecting the change
+        Transfer(tokenPool, msg.sender, tokens);               // execute an event reflecting the change
         return tokens;                                    // ends function and returns
     }
 
@@ -142,7 +142,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         require(balances[msg.sender] > 0);
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
-        balances[creator] = balances[creator].add(amount);   // recycle ParcelX to creator's init account
+        balances[tokenPool] = balances[tokenPool].add(amount);   // recycle ParcelX to tokenPool's init account
         Converted(msg.sender, destinationAccount, amount, extra);
         return true;
     }

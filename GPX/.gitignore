@@ -1,10 +1,10 @@
 node_modules
-.idea
 coverage
 npm-debug.log
 reports
 coverage.json
-build
+build/*
+.idea
 
 # Config files
 config/local.json

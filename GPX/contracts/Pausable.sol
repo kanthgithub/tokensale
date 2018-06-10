@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.20;
 
 import "./MultiOwnable.sol";
 
@@ -26,13 +26,13 @@ contract Pausable is MultiOwnable {
     // called by the owner to pause, triggers stopped state
     function pause() mostOwner(keccak256(msg.data)) whenNotPaused public {
         paused = true;
-        emit Pause();
+        Pause();
     }
 
     // called by the owner to unpause, returns to normal state
     function unpause() mostOwner(keccak256(msg.data)) whenPaused public {
         paused = false;
-        emit Unpause();
+        Unpause();
     }
 
     function isPause() view public returns(bool) {

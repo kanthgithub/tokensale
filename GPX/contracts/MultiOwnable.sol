@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.20;
 
 /**
  * FEATURE 2): MultiOwnable implementation
@@ -13,7 +13,7 @@ contract MultiOwnable {
 
     // constructor is given number of sigs required to do protected "multiOwner" transactions
     // as well as the selection of addresses capable of confirming them.
-    constructor (address[] _otherOwners, uint _multiRequires) internal {
+    function MultiOwnable (address[] _otherOwners, uint _multiRequires) internal {
         require(0 < _multiRequires && _multiRequires <= _otherOwners.length + 1);
         m_numOwners = _otherOwners.length + 1;
         require(m_numOwners <= 8);   // 不支持大于8人

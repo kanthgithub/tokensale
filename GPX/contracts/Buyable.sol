@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.20;
 
 /**
  * Buy GPX automatically when Ethers are received

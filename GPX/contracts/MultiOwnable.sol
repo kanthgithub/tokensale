@@ -1,7 +1,10 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.19;
 
 /**
  * FEATURE 2): MultiOwnable implementation
+ * Creator address + _otherOwners addresses. Transactions approved by _multiRequires addresses will be executed. 
+
+ * All functions needing unit-tests cannot be INTERNAL
  */
 contract MultiOwnable {
 
@@ -12,8 +15,7 @@ contract MultiOwnable {
     mapping (bytes32 => uint) internal m_pendings;
 
     // constructor is given number of sigs required to do protected "multiOwner" transactions
-    // as well as the selection of addresses capable of confirming them.
-    function MultiOwnable (address[] _otherOwners, uint _multiRequires) internal {
+    function MultiOwnable (address[] _otherOwners, uint _multiRequires) {
         require(0 < _multiRequires && _multiRequires <= _otherOwners.length + 1);
         m_numOwners = _otherOwners.length + 1;
         require(m_numOwners <= 8);   // 不支持大于8人
@@ -38,20 +40,20 @@ contract MultiOwnable {
         }
     }
 
-    function isOwner(address currentOwner) internal view returns (bool) {
+    function isOwner(address currentUser) view returns (bool) {
         for (uint i = 0; i < m_numOwners; ++i) {
-            if (m_owners[i] == currentOwner) {
+            if (m_owners[i] == currentUser) {
                 return true;
             }
         }
         return false;
     }
 
-    function checkAndConfirm(address currentOwner, bytes32 operation) internal returns (bool) {
+    function checkAndConfirm(address currentUser, bytes32 operation) returns (bool) {
         uint ownerIndex = m_numOwners;
         uint i;
         for (i = 0; i < m_numOwners; ++i) {
-            if (m_owners[i] == currentOwner) {
+            if (m_owners[i] == currentUser) {
                 ownerIndex = i;
             }
         }

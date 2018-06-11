@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.19;
 
 import "./SafeMath.sol";
 import "./ERC20.sol";
@@ -27,6 +27,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     function ParcelXToken(address[] _otherOwners, uint _multiRequires) 
         MultiOwnable(_otherOwners, _multiRequires) public {
         tokenPool = this;
+        require(tokenPool != address(0));
         balances[tokenPool] = TOTAL_SUPPLY;
     }
 
@@ -109,9 +110,9 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         buyRate = newBuyRate;
     }
 
-    // minimum of 1 ether for purchase in the public, pre-ico, and private sale
+    // minimum of 0.001 ether for purchase in the public, pre-ico, and private sale
     function buy() payable whenNotPaused public returns (uint256) {
-        require(msg.value >= 1 ether);
+        require(msg.value >= 0.001 ether);
         uint256 tokens = msg.value.mul(buyRate);  // calculates the amount
         require(balances[tokenPool] >= tokens);               // checks if it has enough to sell
         balances[tokenPool] = balances[tokenPool].sub(tokens);                        // subtracts amount from seller's balance
@@ -121,10 +122,10 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     }
 
     // gets called when no other function matches
-    function () public payable {
+    function () payable public {
         if (msg.value > 0) {
-            buy();
             Deposit(msg.sender, msg.value);
+            buy();
         }
     }
 

@@ -2,7 +2,7 @@ pragma solidity ^0.4.19;
 
 /**
  * FEATURE 2): MultiOwnable implementation
- * Creator address + _otherOwners addresses. Transactions approved by _multiRequires addresses will be executed. 
+ * Transactions approved by _multiRequires of _multiOwners' addresses will be executed. 
 
  * All functions needing unit-tests cannot be INTERNAL
  */
@@ -15,13 +15,13 @@ contract MultiOwnable {
     mapping (bytes32 => uint) internal m_pendings;
 
     // constructor is given number of sigs required to do protected "multiOwner" transactions
-    function MultiOwnable (address[] _otherOwners, uint _multiRequires) {
-        require(0 < _multiRequires && _multiRequires <= _otherOwners.length + 1);
-        m_numOwners = _otherOwners.length + 1;
-        require(m_numOwners <= 8);   // 不支持大于8人
-        m_owners[0] = msg.sender;
-        for (uint i = 0; i < _otherOwners.length; ++i) {
-            m_owners[1 + i] = _otherOwners[i];
+    function MultiOwnable (address[] _multiOwners, uint _multiRequires) public {
+        require(0 < _multiRequires && _multiRequires <= _multiOwners.length);
+        m_numOwners = _multiOwners.length;
+        require(m_numOwners <= 8);   // Bigger then 8 co-owners, not support !
+        for (uint i = 0; i < _multiOwners.length; ++i) {
+            m_owners[i] = _multiOwners[i];
+            require(m_owners[i] != address(0));
         }
         m_multiRequires = _multiRequires;
     }
@@ -40,7 +40,7 @@ contract MultiOwnable {
         }
     }
 
-    function isOwner(address currentUser) view returns (bool) {
+    function isOwner(address currentUser) public view returns (bool) {
         for (uint i = 0; i < m_numOwners; ++i) {
             if (m_owners[i] == currentUser) {
                 return true;
@@ -49,7 +49,7 @@ contract MultiOwnable {
         return false;
     }
 
-    function checkAndConfirm(address currentUser, bytes32 operation) returns (bool) {
+    function checkAndConfirm(address currentUser, bytes32 operation) public returns (bool) {
         uint ownerIndex = m_numOwners;
         uint i;
         for (i = 0; i < m_numOwners; ++i) {

@@ -24,8 +24,8 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXToken(address[] _otherOwners, uint _multiRequires) 
-        MultiOwnable(_otherOwners, _multiRequires) public {
+    function ParcelXToken(address[] _multiOwners, uint _multiRequires) 
+        MultiOwnable(_multiOwners, _multiRequires) public {
         tokenPool = this;
         require(tokenPool != address(0));
         balances[tokenPool] = TOTAL_SUPPLY;

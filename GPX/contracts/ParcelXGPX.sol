@@ -24,11 +24,14 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXToken(address[] _multiOwners, uint _multiRequires) 
+    function ParcelXToken(address[] _multiOwners, uint _multiRequires, address _advisorAccount) 
         MultiOwnable(_multiOwners, _multiRequires) public {
         tokenPool = this;
         require(tokenPool != address(0));
         balances[tokenPool] = TOTAL_SUPPLY;
+
+        advisorAccount = _advisorAccount;
+        require(advisorAccount != address(0));
     }
 
     /**
@@ -110,21 +113,52 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         buyRate = newBuyRate;
     }
 
+    /**
+     * FEATURE 6) Advisors rewards
+     */
+    address internal advisorAccount = address(0);
+    uint256 internal advisorThreshold = 10000 ether;    // target is 100,000 eth
+    uint256 internal advisorBonus = 35 ether;
+    bool    internal advisorRewarded = false;
+
+    event AdvisorReward(address indexed who, uint256 value);
+    event AdvisorRelay(address indexed who, uint256 _advisorThreshold, uint256 _advisorBonus, bool _advisorRewarded);
+
+    function relayAdvisorReward(uint256 _advisorThreshold, uint256 _advisorBonus, bool _advisorRewarded) mostOwner(keccak256(msg.data)) external returns (bool){
+        advisorThreshold = _advisorThreshold;
+        advisorBonus = _advisorBonus;
+        advisorRewarded = _advisorRewarded;
+        AdvisorRelay(advisorAccount, advisorThreshold, advisorBonus, advisorRewarded);
+        return true;
+    }
+
     // minimum of 0.001 ether for purchase in the public, pre-ico, and private sale
     function buy() payable whenNotPaused public returns (uint256) {
+        Deposit(msg.sender, msg.value);
         require(msg.value >= 0.001 ether);
-        uint256 tokens = msg.value.mul(buyRate);  // calculates the amount
-        require(balances[tokenPool] >= tokens);               // checks if it has enough to sell
-        balances[tokenPool] = balances[tokenPool].sub(tokens);                        // subtracts amount from seller's balance
-        balances[msg.sender] = balances[msg.sender].add(tokens);                  // adds the amount to buyer's balance
-        Transfer(tokenPool, msg.sender, tokens);               // execute an event reflecting the change
-        return tokens;                                    // ends function and returns
+
+        // Token compute & transfer
+        uint256 tokens = msg.value.mul(buyRate);
+        require(balances[tokenPool] >= tokens);
+        balances[tokenPool] = balances[tokenPool].sub(tokens);
+        balances[msg.sender] = balances[msg.sender].add(tokens);
+        Transfer(tokenPool, msg.sender, tokens);
+
+        // Advisors Bonus
+        if (! advisorRewarded) {
+            if (this.balance >= advisorThreshold) {
+                advisorRewarded = true;
+                advisorAccount.transfer(advisorBonus);
+                AdvisorReward(advisorAccount, advisorBonus);
+            }
+        }
+
+        return tokens;
     }
 
     // gets called when no other function matches
     function () payable public {
         if (msg.value > 0) {
-            Deposit(msg.sender, msg.value);
             buy();
         }
     }

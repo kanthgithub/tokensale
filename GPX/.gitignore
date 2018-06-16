@@ -5,6 +5,7 @@ reports
 coverage.json
 build/*
 .idea
+truffle-config.js
 
 # Config files
 config/local.json

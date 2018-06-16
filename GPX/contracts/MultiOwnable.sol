@@ -14,6 +14,8 @@ contract MultiOwnable {
 
     mapping (bytes32 => uint) internal m_pendings;
 
+    event AcceptConfirm(address indexed who, uint confirmTotal);
+    
     // constructor is given number of sigs required to do protected "multiOwner" transactions
     function MultiOwnable (address[] _multiOwners, uint _multiRequires) public {
         require(0 < _multiRequires && _multiRequires <= _multiOwners.length);
@@ -69,6 +71,9 @@ contract MultiOwnable {
                 confirmTotal ++;
             }
         }
+        
+        AcceptConfirm(currentUser, confirmTotal);
+
         if (confirmTotal >= m_multiRequires) {
             delete m_pendings[operation];
             return true;

@@ -4,14 +4,13 @@ import "./SafeMath.sol";
 import "./ERC20.sol";
 import "./MultiOwnable.sol";
 import "./Pausable.sol";
-import "./Buyable.sol";
 import "./Convertible.sol";
 
 
 /**
  * The main body of final smart contract 
  */
-contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
+contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
 
     using SafeMath for uint256;
   
@@ -99,7 +98,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     uint256 internal buyRate = uint256(3731); 
     
     event Deposit(address indexed who, uint256 value);
-    event Withdraw(address indexed who, uint256 value, address indexed lastApprover);
+    event Withdraw(address indexed who, uint256 value, address indexed lastApprover, string extra);
         
 
     function getBuyRate() external view returns (uint256) {
@@ -111,7 +110,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
     }
 
     /**
-     * FEATURE 5): Buyable
+     * FEATURE 4): Buyable
      * minimum of 0.001 ether for purchase in the public, pre-ico, and private sale
      */
     function buy() payable whenNotPaused public returns (uint256) {
@@ -135,10 +134,11 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Buyable, Convertible {
         }
     }
 
-    function execute(address _to, uint256 _value, bytes _data) mostOwner(keccak256(msg.data)) external returns (bool){
+    function execute(address _to, uint256 _value, string _extra) mostOwner(keccak256(msg.data)) external returns (bool){
         require(_to != address(0));
-        Withdraw(_to, _value, msg.sender);
-        return _to.call.value(_value)(_data);
+        Withdraw(_to, _value, msg.sender, _extra);
+        _to.transfer(_value);
+        return true;
     }
 
     /**

@@ -16,6 +16,15 @@ contract ERC20 {
     function approve(address spender, uint256 value) public returns (bool);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-
+    
+    /**	
+    * @dev Fix for the ERC20 short address attack.	
+    * Remove short address attack checks from tokens(https://github.com/OpenZeppelin/openzeppelin-solidity/issues/261)
+    */	
+    modifier onlyPayloadSize(uint256 size) {	
+        require(msg.data.length >= size + 4);
+        _;	
+    }
+    
 }
 

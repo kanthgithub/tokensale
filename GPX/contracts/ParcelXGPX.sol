@@ -37,7 +37,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         return TOTAL_SUPPLY;       
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool) {
+    function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
@@ -52,7 +52,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         return balances[_owner];
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
+    function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
@@ -63,8 +63,8 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         Transfer(_from, _to, _value);
         return true;
     }
-
-    function approve(address _spender, uint256 _value) public returns (bool) {
+    
+    function approve(address _spender, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;

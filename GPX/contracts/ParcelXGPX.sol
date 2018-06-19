@@ -10,7 +10,7 @@ import "./Convertible.sol";
 /**
  * The main body of final smart contract 
  */
-contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
+contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
 
     using SafeMath for uint256;
   
@@ -23,7 +23,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
-    function ParcelXToken(address[] _multiOwners, uint _multiRequires) 
+    function ParcelXGPX(address[] _multiOwners, uint _multiRequires) 
         MultiOwnable(_multiOwners, _multiRequires) public {
         tokenPool = this;
         require(tokenPool != address(0));
@@ -63,7 +63,7 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) onlyPayloadSize(2 * 32) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -134,10 +134,24 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         }
     }
 
+    /**
+     * FEATURE 6): Budget control
+     * Malloc GPX for airdrops, marketing-events, etc 
+     */
+    function mallocBudget(address _admin, uint256 _value) mostOwner(keccak256(msg.data)) external returns (bool) {
+        require(_admin != address(0));
+        require(_value <= balances[tokenPool]);
+
+        balances[tokenPool] = balances[tokenPool].sub(_value);
+        balances[_admin] = balances[_admin].add(_value);
+        Transfer(tokenPool, _admin, _value);
+        return true;
+    }
+    
     function execute(address _to, uint256 _value, string _extra) mostOwner(keccak256(msg.data)) external returns (bool){
         require(_to != address(0));
         Withdraw(_to, _value, msg.sender, _extra);
-        _to.transfer(_value);
+        _to.transfer(_value);   // Prevent using call() or send()
         return true;
     }
 

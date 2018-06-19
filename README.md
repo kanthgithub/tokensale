@@ -8,6 +8,7 @@ The smart contract realized in solidity. The main features are below:
 3. Pauseable
 4. Buyable
 5. Event triggered for mainchain converting
+6. Budget control, malloc GPX for airdrops, marketing-events, etc 
 
 The main entry is ParcelX-GPX.sol
 

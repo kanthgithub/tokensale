@@ -1,16 +1,19 @@
-# Token-sale codes for ParcelX
+# The token-sale smart contract for ParcelX
 
 ##  GPX
-The smart contract realized in solidity. The main features are below:
+In solidity, main features are below:
 
 1. ERC20
 2. MultiOwnable
 3. Pauseable
 4. Buyable
 5. Event triggered for mainchain converting
-6. Budget control, malloc GPX for airdrops, marketing-events, etc 
+6. Budget control. Malloc GPX for airdrops, marketing-events, etc 
 
-The main entry is ParcelX-GPX.sol
+The main entry is ParcelXGPX.sol
+
+##  Report-GPX-Audit
+The 3rd audit report for the security of GPX. Both English and Chinese versions are included.
 
 ##  Swapper
 The deamon module helps GPX converted from ethereum token to our mainchain.

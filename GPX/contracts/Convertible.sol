@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.19;
 
 /**
  * Exchange all my ParcelX token to mainchain GPX

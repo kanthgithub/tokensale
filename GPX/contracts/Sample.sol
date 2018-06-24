@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.19;
 
 /**
  * A sample evaluates whether write-ops could be commited in truffle test-cases.    

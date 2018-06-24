@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity 0.4.19;
 
 import "./SafeMath.sol";
 import "./ERC20.sol";
@@ -19,12 +19,13 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
     uint8 public constant decimals = 18;
     uint256 public constant TOTAL_SUPPLY = uint256(1000000000) * (uint256(10) ** decimals);  // 10,0000,0000
 
-    address internal tokenPool;      // Use a token pool holding all GPX. Avoid using sender address.
+    address internal tokenPool = address(0);      // Use a token pool holding all GPX. Avoid using sender address.
     mapping(address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
     function ParcelXGPX(address[] _multiOwners, uint _multiRequires) 
         MultiOwnable(_multiOwners, _multiRequires) public {
+        require(tokenPool == address(0));
         tokenPool = this;
         require(tokenPool != address(0));
         balances[tokenPool] = TOTAL_SUPPLY;

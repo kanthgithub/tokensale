@@ -1,0 +1,7 @@
+*.log
+coverage.json
+build/*
+.idea
+
+# Config files
+conf/online.conf

@@ -11,6 +11,10 @@ import (
 	"github.com/larspensjo/config"
 )
 
+const (
+	envSavingAesKey = "PARCELX_AES_KEY"
+)
+
 type Conf struct {
 	items map[string]map[string]string
 }
@@ -111,7 +115,7 @@ func get(conf *Conf, section string, key string, secret bool) (string, bool) {
 // 从环境变量中，获取用于解密配置文件中加密项的ASE Key
 // 如果环境变量中没有，则需要用户当场输入。输入一次后，就会被当前程序的环境变量记录下来
 func aesKeyOfConfig() string {
-    var key_val string = os.Getenv("CFG_AES_KEY")
+    var key_val string = os.Getenv(envSavingAesKey)
     if key_val == "" {
         fmt.Printf("Input AES_KEY to Parse Config: ")
 
@@ -125,7 +129,7 @@ func aesKeyOfConfig() string {
             panic("AES_KEY input empty")
         }
         key_val = strings.TrimSpace(key_val)
-        os.Setenv("CFG_AES_KEY", key_val)
+        os.Setenv(envSavingAesKey, key_val)
     }
     return key_val
 }

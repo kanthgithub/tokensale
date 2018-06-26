@@ -8,9 +8,9 @@
 +   To build & run this golang project, you need create a soft link from this folder into $GOPATH\src\parcelx.io\Swapper.
 +   In windows, using command: "mklink /D"
 
-## Schedule:
+## Project Structure:
 * File 'main.go' is the main entry. 
 * Directory 'sale' serves feature 1). 
 * Directory 'swap' serves feature 2).
 * Directory 'tool' contains stand-alone runable programs.
- 
+

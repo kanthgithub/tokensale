@@ -9,7 +9,7 @@ import (
  	"net/http"
 	"io/ioutil"
 	"github.com/bitly/go-simplejson"
-	"parcelx.io/PX-ICOd/util"
+    "parcelx.io/Swapper/util"
 )
 
 type EtherScanError struct {

@@ -20,7 +20,11 @@ type Conf struct {
 }
 
 
-func LoadConfig(filename string) *Conf {
+func LoadConfig(filename string, aseKeyVal string) *Conf {
+
+	if aseKeyVal != "" {
+		os.Setenv(envSavingAesKey, aseKeyVal);
+	}
 
 	cfg, err := config.ReadDefault(filename) //读取配置文件，并返回其Config
 

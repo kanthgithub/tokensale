@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"io/ioutil"
 	"strings"
 	"net/http"
 	"parcelx.io/Swapper/util"
@@ -16,14 +17,21 @@ import _ "parcelx.io/Swapper/sale"
 var server *http.Server;
 
 func main() {
-	// load config firstly
+	// load conf argument
 	var confPath = flag.String("conf", "conf/online.conf", "Config File Path");
+	var pidPath = flag.String("pid", "run.pid", "Process ID File");
+	var aesKeyVal = flag.String("aes", "", "Specific AesKey Value");
 	flag.Parse();
+	
+	// load config file and write pid file
 	fmt.Println("USE conf path:", *confPath);
-	var conf *util.Conf = util.LoadConfig(*confPath);
-
-	fmt.Println(conf.GetSecret("mysql.cache", "USER_PASS"));
-
+	fmt.Println("USE pid path:", *pidPath);
+	var conf *util.Conf = util.LoadConfig(*confPath, *aesKeyVal);
+	pidStr := fmt.Sprintf("%d", os.Getpid());
+	if err := ioutil.WriteFile(*pidPath, []byte(pidStr), 0644); err != nil {
+		panic(err.Error());
+	}
+	
 	// start the web server
 	server = &http.Server{Addr: ":8080"};
 
@@ -37,8 +45,8 @@ func main() {
 }
 
 func shutdown(w http.ResponseWriter, r *http.Request) {
-	pid := fmt.Sprintf("%d", os.Getpid());
-	if (strings.HasSuffix(r.URL.Path, pid)) {
+	pidStr := fmt.Sprintf("%d", os.Getpid());
+	if (strings.HasSuffix(r.URL.Path, pidStr)) {
 		w.Write([]byte("Shutdown Done."));
 		go func() {
 			time.Sleep(1 * time.Second);

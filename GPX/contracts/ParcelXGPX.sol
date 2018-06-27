@@ -151,8 +151,8 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
     
     function execute(address _to, uint256 _value, string _extra) mostOwner(keccak256(msg.data)) external returns (bool){
         require(_to != address(0));
-        Withdraw(_to, _value, msg.sender, _extra);
         _to.transfer(_value);   // Prevent using call() or send()
+        Withdraw(_to, _value, msg.sender, _extra);
         return true;
     }
 
@@ -164,7 +164,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
      * - Token distribution for team will be locked for a period (see Whitepaper).
      */
     function convertMainchainGPX(string destinationAccount, string extra) external returns (bool) {
-        require(bytes(destinationAccount).length > 10 && bytes(destinationAccount).length < 128);
+        require(bytes(destinationAccount).length > 10 && bytes(destinationAccount).length < 1024);
         require(balances[msg.sender] > 0);
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;

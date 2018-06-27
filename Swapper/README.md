@@ -2,7 +2,7 @@
 
 ## Features:
 1. Monitor & Manage the whole progress of ParcelX public tokensales.
-2. Ensure GPX converted from ethereum token to our mainchain. Need a full-node mvsd running on local.
+2. Ensure GPX converted from ethereum token to our mainchain.
 
 ## Environment:
 +  To build & run this golang project, you need create a soft link from this folder into $GOPATH\src\parcelx.io\Swapper.

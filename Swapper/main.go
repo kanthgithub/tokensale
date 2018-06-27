@@ -17,6 +17,7 @@ import _ "parcelx.io/Swapper/sale"
 var server *http.Server;
 
 func main() {
+	
 	// load conf argument
 	var confPath = flag.String("conf", "conf/online.conf", "Config File Path");
 	var pidPath = flag.String("pid", "run.pid", "Process ID File");
@@ -31,17 +32,24 @@ func main() {
 	if err := ioutil.WriteFile(*pidPath, []byte(pidStr), 0644); err != nil {
 		panic(err.Error());
 	}
-	
+	_ = conf;
+
 	// start the web server
 	server = &http.Server{Addr: ":8080"};
 
 	http.Handle("/", http.FileServer(http.Dir("./www")));
 	http.HandleFunc("/shutdown/", shutdown);
+	http.HandleFunc("/test/", test);
 	if err := server.ListenAndServe(); err != nil {
 		fmt.Println("Shutdown:", err);
 	} else {
 		fmt.Println("Shutdown normally.");
 	}
+}
+
+
+func test(w http.ResponseWriter, r *http.Request) {
+	panic("EEEE");
 }
 
 func shutdown(w http.ResponseWriter, r *http.Request) {

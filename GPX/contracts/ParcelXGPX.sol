@@ -14,7 +14,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
 
     using SafeMath for uint256;
   
-    string public constant name = "ParcelX Token";
+    string public constant name = "ParcelX";
     string public constant symbol = "GPX";
     uint8 public constant decimals = 18;
     uint256 public constant TOTAL_SUPPLY = uint256(1000000000) * (uint256(10) ** decimals);  // 10,0000,0000
@@ -137,7 +137,7 @@ contract ParcelXGPX is ERC20, MultiOwnable, Pausable, Convertible {
 
     /**
      * FEATURE 6): Budget control
-     * Malloc GPX for airdrops, marketing-events, etc 
+     * Malloc GPX for airdrops, marketing-events, bonus, etc 
      */
     function mallocBudget(address _admin, uint256 _value) mostOwner(keccak256(msg.data)) external returns (bool) {
         require(_admin != address(0));
